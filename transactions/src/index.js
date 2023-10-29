@@ -16,13 +16,13 @@ app.post('/transactions', async (req, res) => {
     }
 
     try {
-        await prisma.$executeRaw`
-            INSERT INTO Transactions
-            (card_number)
-            VALUES (${cardNumber})
-        `
+        const { id } = await prisma.transactions.create({
+            data: {
+                'card_number': cardNumber
+            }
+        })
 
-        return res.status(201).send('Transaction created successfully')
+        return res.status(201).json({ id })
     } catch (err) {
         console.log(err)
         return res.status(500).send('Unable to create transaction')
