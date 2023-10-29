@@ -14,7 +14,7 @@ app.post('/rentals/:scooterId', async (req, res) => {
 
     try {
         await axios.put(`http://localhost:8008/scooters/${scooterId}/lock`)
-        
+
         const { data: { id: transactionId } } = await axios.post(`http://localhost:8002/transactions`, {
             cardNumber
         })
@@ -27,8 +27,11 @@ app.post('/rentals/:scooterId', async (req, res) => {
 
         return res.status(201).send('Rental created successfully')
     } catch (err) {
-        console.log(err)
-        return res.status(500).send('Unable to create rental')
+        let errorMessage = err?.response?.data
+        if (!errorMessage) {
+            errorMessage = 'Unable to create rental'
+        }
+        return res.status(500).send(errorMessage)
     }
 })
 

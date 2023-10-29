@@ -13,6 +13,11 @@ app.put('/scooters/:id/lock', async (req, res) => {
     }
 
     try {
+        const { data: scooterData } = await axios.get(`http://localhost:8001/scooters/${id}`)
+        if (scooterData.status !== 'available') {
+            return res.status(400).send('Scooter is not available')
+        }
+
         const response = await axios.put(`http://localhost:8001/scooters/${id}`, {
             status: 'rented'
         })
@@ -23,8 +28,7 @@ app.put('/scooters/:id/lock', async (req, res) => {
 
         return res.status(200).send('Scooter was locked successfully')
     } catch (err) {
-        console.log(err.request)
-        return res.status(500).send('Unable to unlock the scooter')
+        return res.status(500).send('Unable to lock the scooter')
     }
 })
 
