@@ -5,7 +5,7 @@ const app = express()
 
 app.use(express.urlencoded({ extended: true }))
 
-app.post('/scooters/:id/lock', async (req, res) => {
+app.put('/scooters/:id/lock', async (req, res) => {
     const { id } = req.params
 
     if (!id) {
@@ -28,7 +28,7 @@ app.post('/scooters/:id/lock', async (req, res) => {
     }
 })
 
-app.post('/scooters/:id/unlock', async (req, res) => {
+app.put('/scooters/:id/unlock', async (req, res) => {
     const { id } = req.params
 
     if (!id) {
