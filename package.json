@@ -1,0 +1,13 @@
+{
+  "name": "scooter-rental",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm --prefix ./users/ run dev & npm --prefix ./scooter-access/ run dev & npm --prefix ./scooter/ run dev & npm --prefix ./rentals/ run dev & npm --prefix ./payment/ run dev & npm --prefix ./api-gateway/ run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
