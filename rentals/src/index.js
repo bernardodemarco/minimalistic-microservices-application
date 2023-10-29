@@ -21,7 +21,7 @@ app.post('/rentals/:scooterId', async (req, res) => {
             VALUES (${rentalAmount})
         `
 
-        return res.status(201).send('Retal created successfully')
+        return res.status(201).send('Rental created successfully')
     } catch (err) {
         console.log(err)
         return res.status(500).send('Unable to create rental')
