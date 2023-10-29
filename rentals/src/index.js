@@ -10,15 +10,19 @@ app.use(express.json())
 
 app.post('/rentals/:scooterId', async (req, res) => {
     const { scooterId } = req.params
-    const { rentalAmount } = req.body
+    const { rentalAmount, cardNumber } = req.body
 
     try {
         await axios.put(`http://localhost:8008/scooters/${scooterId}/lock`)
         
+        const { data: { id: transactionId } } = await axios.post(`http://localhost:8002/transactions`, {
+            cardNumber
+        })
+
         await prisma.$executeRaw`
-            INSERT INTO rentals
-            (rental_amount)
-            VALUES (${rentalAmount})
+            INSERT INTO Rentals
+            (rental_amount, scooter_id, transaction_id)
+            VALUES (${rentalAmount}, ${scooterId}, ${transactionId})
         `
 
         return res.status(201).send('Rental created successfully')
@@ -28,22 +32,33 @@ app.post('/rentals/:scooterId', async (req, res) => {
     }
 })
 
-app.put('/rentals/:id/scooters/:scooterId/end', async (req, res) => {
-    const { id, scooterId } = req.params
+app.put('/rentals/:id/end', async (req, res) => {
+    const { id } = req.params
 
     try {
+        const rental = await prisma.$queryRaw`
+            SELECT scooter_id, transaction_id
+            FROM Rentals
+            WHERE id = ${id}
+        `
+        if (rental.length === 0) {
+            return res.status(404).send(`Rental not found`)
+        }
+
+        const {
+            scooter_id: scooterId,
+            transaction_id: transactionId
+        } = rental[0]
+
         await axios.put(`http://localhost:8008/scooters/${scooterId}/unlock`)
 
-        const response = await prisma.$executeRaw`
+        await axios.put(`http://localhost:8002/transactions/${transactionId}/charge`)
+
+        await prisma.$executeRaw`
             UPDATE Rentals
             SET end_time = ${Date.now()}
             WHERE id = ${id}
         `
-
-        const rentalIdNotFound = response === 0
-        if (rentalIdNotFound) {
-            return res.status(404).send('Rental not found')
-        }
 
         return res.status(200).send('Rental ended successfully')
     } catch (err) {

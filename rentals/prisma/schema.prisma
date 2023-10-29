@@ -8,8 +8,10 @@ datasource db {
 }
 
 model Rentals {
-  id            Int       @id @default(autoincrement())
-  start_time    DateTime  @default(now())
-  end_time      DateTime?
-  rental_amount Float
+  id             Int       @id @default(autoincrement())
+  start_time     DateTime  @default(now())
+  end_time       DateTime?
+  rental_amount  Float
+  scooter_id     Int
+  transaction_id Int
 }
