@@ -24,7 +24,7 @@ app.post('/scooters', async (req, res) => {
             VALUES (${status}, ${latitude}, ${longitude})
         `
 
-        return res.status(201).send('Scooter create successfully')
+        return res.status(201).send('Scooter created successfully')
     } catch (err) {
         console.log(err)
         return res.status(500).send('Unable to create scooter')

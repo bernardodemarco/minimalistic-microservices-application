@@ -40,22 +40,28 @@ app.put('/rentals/:id/end', async (req, res) => {
 
     try {
         const rental = await prisma.$queryRaw`
-            SELECT scooter_id, transaction_id
+            SELECT scooter_id, transaction_id, end_time
             FROM Rentals
             WHERE id = ${id}
         `
         if (rental.length === 0) {
-            return res.status(404).send(`Rental not found`)
+            return res.status(404).send('Rental not found')
         }
 
         const {
             scooter_id: scooterId,
-            transaction_id: transactionId
+            transaction_id: transactionId,
+            end_time: endTime
         } = rental[0]
 
-        await axios.put(`http://localhost:8008/scooters/${scooterId}/unlock`)
+        if (!!endTime) {
+            return res.status(400).send('Rental has already ended')
+        }
 
-        await axios.put(`http://localhost:8002/transactions/${transactionId}/charge`)
+        await Promise.all([
+            axios.put(`http://localhost:8008/scooters/${scooterId}/unlock`),
+            axios.put(`http://localhost:8002/transactions/${transactionId}/charge`)
+        ])
 
         await prisma.$executeRaw`
             UPDATE Rentals
@@ -78,7 +84,6 @@ app.get('/rentals', async (req, res) => {
 
     return res.status(200).json(rentals)
 })
-
 
 port = 8003
 app.listen(port, () => {
