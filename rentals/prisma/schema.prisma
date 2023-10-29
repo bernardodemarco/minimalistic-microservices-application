@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Rentals {
+  id            Int       @id @default(autoincrement())
+  start_time    DateTime  @default(now())
+  end_time      DateTime?
+  rental_amount Float
+}
