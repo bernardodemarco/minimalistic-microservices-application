@@ -14,7 +14,7 @@ app.put('/scooters/:id/lock', async (req, res) => {
 
     try {
         const response = await axios.put(`http://localhost:8001/scooters/${id}`, {
-            status: 'not available'
+            status: 'rented'
         })
 
         if (response.status !== 200) {
